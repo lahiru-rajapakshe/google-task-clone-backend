@@ -22,8 +22,7 @@ import java.util.logging.Logger;
 @WebListener
 public class LogInitializer implements ServletContextListener {
 
-
-    private final Logger logger = Logger.getLogger(WebAppContext.class.getName());
+    private final Logger logger = Logger.getLogger(LogInitializer.class.getName());
     private FileHandler fileHandler;
 
     @Override
@@ -42,9 +41,9 @@ public class LogInitializer implements ServletContextListener {
             }
 
             if (profile.equals("dev")) {
-                Logger.getLogger("").setLevel(Level.FINE);
+                Logger.getLogger("lk.lahiru.tasks").setLevel(Level.FINE);
             } else {
-                Logger.getLogger("").setLevel(Level.INFO);
+                Logger.getLogger("lk.lahiru.tasks").setLevel(Level.INFO);
             }
 
             Path logDirPath = Paths.get(logDir);
@@ -58,6 +57,7 @@ public class LogInitializer implements ServletContextListener {
 
             final String path = logDirPath.toAbsolutePath().toString();
             installFileHandler(getPath(path));
+            Logger.getLogger("lk.lahiru.tasks").setUseParentHandlers(false);
 
             ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
             executor.scheduleWithFixedDelay(() -> installFileHandler(getPath(path)),
@@ -77,13 +77,13 @@ public class LogInitializer implements ServletContextListener {
     private void installFileHandler(String path) {
         if (fileHandler != null){
             fileHandler.close();
-            Logger.getLogger("").removeHandler(fileHandler);
+            Logger.getLogger("lk.lahiru.tasks").removeHandler(fileHandler);
         }
         try {
             fileHandler = new FileHandler(path,2 * 1024 * 1024, 20,true);
             fileHandler.setFormatter(fileHandler.getFormatter());
             fileHandler.setLevel(Logger.getLogger("").getLevel());
-            Logger.getLogger("").addHandler(fileHandler);
+            Logger.getLogger("lk.lahiru.tasks").addHandler(fileHandler);
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
