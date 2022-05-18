@@ -48,7 +48,7 @@ public class DBInitializer implements ServletContextListener {
 
 //                Files.readAllLines(Paths.get(this.getClass().getResource("/db-script.sql").toURI()))
 //                        .stream().reduce((s, s2) -> s+=s2).get()
-
+//this is reduce base
                 stm.execute(sqlScript);
             }
 
