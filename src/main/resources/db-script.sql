@@ -33,7 +33,7 @@ CREATE TABLE sub_task
     title    VARCHAR(200)                      NOT NULL,
     details  VARCHAR(500),
     position INT                                        DEFAULT 0,
-    status   ENUM ('COMPLETED', 'needsAction') NOT NULL DEFAULT 'needsAction',
+    status   ENUM ('completed', 'needsAction') NOT NULL DEFAULT 'needsAction',
     task_id  INT                               NOT NULL,
     CONSTRAINT FOREIGN KEY fk_task (task_id) REFERENCES task (id)
 );
