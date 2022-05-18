@@ -1,5 +1,5 @@
 
-CREATE TABLE user
+CREATE TABLE IF NOT EXISTS user
 (
     id          CHAR(36) PRIMARY KEY,
     email       VARCHAR(100) UNIQUE NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE user
     profile_pic VARCHAR(500)
 );
 
-CREATE TABLE task_list
+CREATE TABLE IF NOT EXISTS  task_list
 (
     id      INT AUTO_INCREMENT PRIMARY KEY,
     name    VARCHAR(200) NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE task_list
     CONSTRAINT FOREIGN KEY (user_id) REFERENCES user (id)
 );
 
-CREATE TABLE task
+CREATE TABLE IF NOT EXISTS  task
 (
     id           INT AUTO_INCREMENT PRIMARY KEY,
     title        VARCHAR(200)                      NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE task
     CONSTRAINT FOREIGN KEY fk_task (task_list_id) REFERENCES task_list (id)
 );
 
-CREATE TABLE sub_task
+CREATE TABLE IF NOT EXISTS  sub_task
 (
     id       INT AUTO_INCREMENT PRIMARY KEY,
     title    VARCHAR(200)                      NOT NULL,
