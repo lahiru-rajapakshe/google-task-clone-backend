@@ -23,11 +23,9 @@ public class UserServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if(request.getContentType()==null || !request.getContentType().startsWith("multipart/form-data")){
-            response.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+        if(request.getContentType()==null||request.getContentType().startsWith("multipart/form-data")){
+            response.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,"Invalid content type or no content type is provided");
             return;
-
-
         }
     }
 }
