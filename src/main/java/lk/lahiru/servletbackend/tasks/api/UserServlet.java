@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.logging.Logger;
 @MultipartConfig(location = "/tmp",maxFileSize = 10*1024*1024)
-@WebServlet(name = "UserServlet", value = "/UserServlet")
+@WebServlet(name = "UserServlet", value = "/v1/users/*")
 public class UserServlet extends HttpServlet {
 
     private final Logger logger= Logger.getLogger(UserServlet.class.getName());
@@ -25,9 +25,13 @@ public class UserServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if(request.getContentType()==null||request.getContentType().startsWith("multipart/form-data")){
-            response.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,"Invalid content type or no content type is provided");
-            return;
+
+        if (request.getContentType() == null || !request.getContentType().startsWith("multipart/form-data")) {
+            throw new ResponseStatusException(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, "Invalid content type or no content type is provided");
+        }
+
+        if (request.getPathInfo() != null && !request.getPathInfo().equals("/")) {
+            throw new ResponseStatusException(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Invalid end point for a POST request");
         }
 
         String name = request.getParameter("name");
@@ -44,6 +48,5 @@ public class UserServlet extends HttpServlet {
         } else if (picture != null && !picture.getContentType().startsWith("image")) {
             throw new ResponseStatusException(HttpServletResponse.SC_BAD_REQUEST, "Invalid picture");
         }
-
     }
 }
