@@ -1,5 +1,7 @@
 package lk.lahiru.servletbackend.tasks.dto;
 
+import jakarta.json.bind.annotation.JsonbTransient;
+
 import java.io.Serializable;
 
 public class UserDTO implements Serializable {
@@ -44,6 +46,7 @@ public class UserDTO implements Serializable {
         this.email = email;
     }
 
+    @JsonbTransient
     public String getPassword() {
         return password;
     }

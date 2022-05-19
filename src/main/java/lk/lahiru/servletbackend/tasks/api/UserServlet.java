@@ -1,6 +1,11 @@
 package lk.lahiru.servletbackend.tasks.api;
 
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import lk.lahiru.servletbackend.tasks.Util.HttpServlet2;
 import lk.lahiru.servletbackend.tasks.Util.ResponseStatusException;
+import lk.lahiru.servletbackend.tasks.dto.UserDTO;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.*;
@@ -18,19 +23,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 import java.util.logging.Logger;
-@MultipartConfig(location = "/tmp",maxFileSize = 10*1024*1024)
-@WebServlet(name = "UserServlet", value = "/v1/users/*")
-public class UserServlet extends HttpServlet {
 
-    private final Logger logger= Logger.getLogger(UserServlet.class.getName());
+@MultipartConfig(location = "/tmp", maxFileSize = 10 * 1024 * 1024)
+@WebServlet(name = "UserServlet", value = "/v1/users/*")
+public class UserServlet extends HttpServlet2 {
 
     @Resource(name = "java:comp/env/jdbc/pool")
-    private  volatile DataSource pool;
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-    }
+    private volatile DataSource pool;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -61,14 +60,21 @@ public class UserServlet extends HttpServlet {
         Connection connection = null;
         try{
             connection = pool.getConnection();
+
+            PreparedStatement stm = connection.prepareStatement("SELECT id FROM user WHERE email = ?");
+            stm.setString(1, email);
+            if (stm.executeQuery().next()){
+                throw new ResponseStatusException(HttpServletResponse.SC_CONFLICT, "A user has been already registered with this email");
+            }
+
             connection.setAutoCommit(false);
 
-            PreparedStatement stm = connection.
+            stm = connection.
                     prepareStatement("INSERT INTO user (id, email, password, full_name, profile_pic) VALUES (?, ?, ?, ?, ?)");
             String id = UUID.randomUUID().toString();
             stm.setString(1, id);
             stm.setString(2, email);
-            stm.setString(3, password);
+            stm.setString(3, DigestUtils.sha256Hex(password));
             stm.setString(4, name);
 
             String pictureUrl = request.getScheme() + "://" + request.getServerName() + ":"
@@ -94,8 +100,14 @@ public class UserServlet extends HttpServlet {
             }
 
             connection.commit();
+
+            response.setStatus(HttpServletResponse.SC_CREATED);
+            response.setContentType("application/json");
+            UserDTO userDTO = new UserDTO(id, name, email, password, pictureUrl);
+            Jsonb jsonb = JsonbBuilder.create();
+            jsonb.toJson(userDTO, response.getWriter());
         } catch (SQLException e) {
-            throw new ResponseStatusException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to register the user");
+            throw new ResponseStatusException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to register the user", e);
         }finally{
             try {
                 connection.rollback();
