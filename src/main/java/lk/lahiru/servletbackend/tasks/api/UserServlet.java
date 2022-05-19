@@ -35,7 +35,7 @@ public class UserServlet extends HttpServlet2 {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (!(req.getPathInfo() != null &&
-                (req.getPathInfo().replaceAll("/", "").length() != 36))){
+                (req.getPathInfo().replaceAll("/", "").length() == 36))){
             throw new ResponseStatusException(404, "Invalid user id");
         }
 
@@ -52,7 +52,7 @@ public class UserServlet extends HttpServlet2 {
                 String name = rst.getString("full_name");
                 String email = rst.getString("email");
                 String password = rst.getString("password");
-                String picture = rst.getString("picture");
+                String picture = rst.getString("profile_pic");
                 UserDTO user = new UserDTO(userId, name, email, password, picture);
                 Jsonb jsonb = JsonbBuilder.create();
 
