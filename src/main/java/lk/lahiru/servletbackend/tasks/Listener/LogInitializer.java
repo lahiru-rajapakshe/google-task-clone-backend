@@ -15,6 +15,7 @@ import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +28,8 @@ public class LogInitializer implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+
+        Logger.getLogger("lk.ijse.dep8.tasks").addHandler(new ConsoleHandler());
 
         try {
             final Properties prop = new Properties();
@@ -41,9 +44,9 @@ public class LogInitializer implements ServletContextListener {
             }
 
             if (profile.equals("dev")) {
-                Logger.getLogger("lk.lahiru.tasks").setLevel(Level.FINE);
+                Logger.getLogger("lk.ijse.dep8.tasks").setLevel(Level.FINE);
             } else {
-                Logger.getLogger("lk.lahiru.tasks").setLevel(Level.INFO);
+                Logger.getLogger("lk.ijse.dep8.tasks").setLevel(Level.INFO);
             }
 
             Path logDirPath = Paths.get(logDir);
@@ -57,7 +60,7 @@ public class LogInitializer implements ServletContextListener {
 
             final String path = logDirPath.toAbsolutePath().toString();
             installFileHandler(getPath(path));
-            Logger.getLogger("lk.lahiru.tasks").setUseParentHandlers(false);
+            Logger.getLogger("lk.ijse.dep8.tasks").setUseParentHandlers(false);
 
             ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
             executor.scheduleWithFixedDelay(() -> installFileHandler(getPath(path)),
@@ -77,13 +80,13 @@ public class LogInitializer implements ServletContextListener {
     private void installFileHandler(String path) {
         if (fileHandler != null){
             fileHandler.close();
-            Logger.getLogger("lk.lahiru.tasks").removeHandler(fileHandler);
+            Logger.getLogger("lk.ijse.dep8.tasks").removeHandler(fileHandler);
         }
         try {
             fileHandler = new FileHandler(path,2 * 1024 * 1024, 20,true);
             fileHandler.setFormatter(fileHandler.getFormatter());
-            fileHandler.setLevel(Logger.getLogger("").getLevel());
-            Logger.getLogger("lk.lahiru.tasks").addHandler(fileHandler);
+            fileHandler.setLevel(Logger.getLogger("lk.ijse.dep8.tasks").getLevel());
+            Logger.getLogger("lk.ijse.dep8.tasks").addHandler(fileHandler);
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
