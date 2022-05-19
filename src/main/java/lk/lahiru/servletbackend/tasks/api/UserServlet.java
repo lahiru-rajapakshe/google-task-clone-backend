@@ -58,14 +58,10 @@ public class UserServlet extends HttpServlet {
             throw new ResponseStatusException(HttpServletResponse.SC_BAD_REQUEST, "Invalid picture");
         }
 
-        String appLocation = getServletContext().getRealPath("/");
-        Path path = Paths.get(appLocation, "uploads");
-        if (Files.notExists(path)) {
-            Files.createDirectory(path);
-        }
-
-        try (Connection connection = pool.getConnection()) {
-            //connection.setAutoCommit(false);
+        Connection connection = null;
+        try{
+            connection = pool.getConnection();
+            connection.setAutoCommit(false);
 
             PreparedStatement stm = connection.
                     prepareStatement("INSERT INTO user (id, email, password, full_name, profile_pic) VALUES (?, ?, ?, ?, ?)");
@@ -75,7 +71,8 @@ public class UserServlet extends HttpServlet {
             stm.setString(3, password);
             stm.setString(4, name);
 
-            String pictureUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + getServletContext().getContextPath();
+            String pictureUrl = request.getScheme() + "://" + request.getServerName() + ":"
+                    + request.getServerPort() + request.getContextPath();
             pictureUrl += "/uploads/" + id ;
 
             stm.setString(5, pictureUrl);
@@ -83,11 +80,30 @@ public class UserServlet extends HttpServlet {
                 throw new SQLException("Failed to register the user");
             }
 
-            picture.write(path.resolve(id).toAbsolutePath().toString());
+            String appLocation = getServletContext().getRealPath("/");
+            Path path = Paths.get(appLocation, "uploads");
+            if (Files.notExists(path)) {
+                Files.createDirectory(path);
+            }
 
-            //connection.rollback();
+            String picturePath = path.resolve(id).toAbsolutePath().toString();
+            picture.write(picturePath);
+
+            if (Files.notExists(Paths.get(picturePath))){
+                throw new ResponseStatusException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to save the picture");
+            }
+
+            connection.commit();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new ResponseStatusException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to register the user");
+        }finally{
+            try {
+                connection.rollback();
+                connection.setAutoCommit(true);
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
