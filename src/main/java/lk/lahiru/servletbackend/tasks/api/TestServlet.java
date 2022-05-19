@@ -7,11 +7,12 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 
+
 @WebServlet(name = "TestServlet", value = "/test")
 public class TestServlet extends HttpServlet2 {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        throw new RuntimeException("Something goes bad");
+        throw new ResponseStatusException(201, "Something goes bad");
     }
 
     @Override

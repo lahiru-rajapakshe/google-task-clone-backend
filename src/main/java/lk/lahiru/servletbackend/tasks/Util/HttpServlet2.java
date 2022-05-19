@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 public class HttpServlet2 extends HttpServlet {
 
     private final Logger logger = Logger.getLogger(HttpServlet2.class.getName());
@@ -31,9 +32,20 @@ public class HttpServlet2 extends HttpServlet {
             t.printStackTrace(pw);
 
             resp.setContentType("application/json");
-            HttpResponseErrorMsg errorMsg = new HttpResponseErrorMsg(new Date().getTime(),
-                    500, "Internal Server Error",
-                    sw.toString(), t.getMessage(), req.getRequestURI());
+
+            HttpResponseErrorMsg errorMsg = null;
+            if (t instanceof ResponseStatusException){
+                ResponseStatusException rse = (ResponseStatusException) t;
+                resp.setStatus(rse.getStatus());
+                errorMsg = new HttpResponseErrorMsg(new Date().getTime(),
+                        rse.getStatus(),
+                        sw.toString(), t.getMessage(), req.getRequestURI());
+            }else{
+                errorMsg = new HttpResponseErrorMsg(new Date().getTime(),
+                        500,
+                        sw.toString(), t.getMessage(), req.getRequestURI());
+            }
+
             Jsonb jsonb = JsonbBuilder.create();
             jsonb.toJson(errorMsg, resp.getWriter());
         }
