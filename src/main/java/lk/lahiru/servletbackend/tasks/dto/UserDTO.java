@@ -1,6 +1,8 @@
 package lk.lahiru.servletbackend.tasks.dto;
 
-ublic class UserDTO implements Serializable {
+import java.io.Serializable;
+
+public class UserDTO implements Serializable {
     private String id;
     private String name;
     private String email;
