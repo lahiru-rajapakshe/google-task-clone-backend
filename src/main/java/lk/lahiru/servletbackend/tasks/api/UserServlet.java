@@ -7,7 +7,15 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import javax.sql.DataSource;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.logging.Logger;
 @MultipartConfig(location = "/tmp",maxFileSize = 10*1024*1024)
 @WebServlet(name = "UserServlet", value = "/v1/users/*")
@@ -48,5 +56,38 @@ public class UserServlet extends HttpServlet {
         } else if (picture != null && !picture.getContentType().startsWith("image")) {
             throw new ResponseStatusException(HttpServletResponse.SC_BAD_REQUEST, "Invalid picture");
         }
+
+
+        String appLocation = getServletContext().getRealPath("/");
+        Path path = Paths.get(appLocation, "uploads");
+        if (Files.notExists(path)) {
+            Files.createDirectory(path);
+        }
+
+        try (Connection connection = pool.getConnection()) {
+            connection.setAutoCommit(false);
+
+            PreparedStatement stm = connection.
+                    prepareStatement("INSERT INTO user (id, email, password, full_name) VALUES (UUID(), ?, ?, ?)");
+            stm.setString(1, email);
+            stm.setString(2, password);
+            stm.setString(3, name);
+            if (stm.executeUpdate() != 1){
+                throw new SQLException("Failed to register the user");
+            }
+
+            stm = connection.prepareStatement("SELECT id FROM user WHERE email = ?");
+            stm.setString(1, email);
+            ResultSet rst = stm.executeQuery();
+            rst.next();
+            String uuid = rst.getString("id");
+
+            Path imagePath = path.resolve(uuid);
+
+            connection.rollback();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 }
