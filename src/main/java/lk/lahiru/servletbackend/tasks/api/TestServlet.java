@@ -1,6 +1,7 @@
 package lk.lahiru.servletbackend.tasks.api;
 
 import lk.lahiru.servletbackend.tasks.Util.HttpServlet2;
+import lk.lahiru.servletbackend.tasks.Util.ResponseStatusException;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
