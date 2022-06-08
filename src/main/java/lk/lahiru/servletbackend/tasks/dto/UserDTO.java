@@ -1,5 +1,6 @@
 package lk.lahiru.servletbackend.tasks.dto;
 
+import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbTransient;
 
 import java.io.Serializable;
@@ -55,12 +56,23 @@ public class UserDTO implements Serializable {
         this.password = password;
     }
 
+    @JsonbProperty(nillable = true)
     public String getPicture() {
         return picture;
     }
 
     public void setPicture(String picture) {
         this.picture = picture;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        UserDTO compareWith = (UserDTO) obj;
+        return this.getId().equals(compareWith.getId()) &&
+                this.getName().equals(compareWith.getName()) &&
+                this.getPassword().equals(compareWith.getPassword()) &&
+                this.getPicture().equals(compareWith.getPicture()) &&
+                this.getEmail().equals(compareWith.getEmail());
     }
 
     @Override
