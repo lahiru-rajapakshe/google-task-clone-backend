@@ -1,4 +1,4 @@
-package lk.lahiru.servletbackend.tasks.api;
+package lk.lahiru.servletbackend.tasks.tasks.api;
 
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;

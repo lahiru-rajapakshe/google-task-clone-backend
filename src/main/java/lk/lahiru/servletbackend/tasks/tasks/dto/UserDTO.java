@@ -1,4 +1,4 @@
-package lk.lahiru.servletbackend.tasks.dto;
+package lk.lahiru.servletbackend.tasks.tasks.dto;
 
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbTransient;
