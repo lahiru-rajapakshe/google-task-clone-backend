@@ -11,7 +11,7 @@ public class ResponseStatusException extends RuntimeException{
 
     public ResponseStatusException(int status, String message, Throwable cause) {
         super(message, cause);
-        this.status = status;
+        this.status = status
     }
 
     public int getStatus() {
