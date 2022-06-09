@@ -1,15 +1,14 @@
 package lk.lahiru.servletbackend.tasks.dao.custom.impl;
 
 import lk.ijse.dep8.tasks.dao.custom.QueryDAO;
-
-import java.sql.Connection;
+import org.hibernate.Session;
 
 public class QueryDAOImpl implements QueryDAO {
 
-    private final Connection connection;
+    private final Session session;
 
-    public QueryDAOImpl(Connection connection) {
-        this.connection = connection;
+    public QueryDAOImpl(Session session) {
+        this.session = session;
     }
 
 }
